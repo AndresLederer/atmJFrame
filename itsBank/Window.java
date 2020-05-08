@@ -18,6 +18,7 @@ public class Window extends JFrame{
 	private Font inputFont = new Font("arial",2,12);
 	private Font warningFont = new Font("arial",1,10);
 	private Font greetFont = new Font("arial",3,12);
+	private Font systemFont = new Font("arial",1,12);
 	
 	private JPanel indexPanel; //index JPanel
 	private JTextField clientId; //only in indexPanel
@@ -26,6 +27,20 @@ public class Window extends JFrame{
 	private JPanel accountPanel; //account JPanel
 	private Client user; // client using the sftw
 	private BankAccount userAccount; //BankAccount of user
+	
+	//DEPOSIT AUXILIARIES
+	private JPanel depositPanel; //shows panel for deposits
+	private JTextField depositTxtField; //user will input their deposit here
+	
+	//BALANCE AUXILIARIES
+	private JPanel balancePanel; //shows panel for withdraw
+	
+	//WITHDRAW AUXILIARIES
+	private JPanel withdrawPanel; //shows balance
+	private JTextField withdrawTxtField;
+	
+	private JLabel userWarning; //used in deposit and withdraw panels 
+	private JLabel userSuccess; //used in deposit,withdraw and balance panels
 	
 	//constructor
 	public Window(ArrayList<Client> bankClients,ArrayList<BankAccount> bankAccounts) {
@@ -97,66 +112,6 @@ public class Window extends JFrame{
 		
 		indexPanel.add(clientId);
 		indexPanel.add(clientPass);
-		
-//		//clears the text fields when focused & shows the tip massage if the fields are empty
-//		//On cliend it text field
-//		FocusListener focusOnId = new FocusListener() {
-//			@Override
-//			public void focusGained(FocusEvent e) {
-//				if(clientId.getText().equals("Client personal ID")) {
-//					clientId.setText("");
-//					clientId.setFont(inputFont);
-//					clientId.setForeground(Color.black);
-//				}
-//			}
-//			@Override
-//			public void focusLost(FocusEvent e) {
-//				if(clientId.getText().equals("")) {
-//					clientId.setFont(tipFont);
-//					clientId.setForeground(Color.gray);
-//					clientId.setText("Client personal ID");
-//				}
-//			}
-//			
-//		};
-//		//on client password account text field
-//		FocusListener focusOnPass = new FocusListener() {
-//			@Override
-//			public void focusGained(FocusEvent e) {
-//				if(clientPass.getText().equals("Account password")) {
-//					clientPass.setText("");
-//					clientPass.setFont(inputFont);
-//					clientPass.setForeground(Color.black);
-//				}
-//			}
-//			@Override
-//			public void focusLost(FocusEvent e) {
-//				if(clientPass.getText().equals("")) {
-//					clientPass.setFont(tipFont);
-//					clientPass.setForeground(Color.gray);
-//					clientPass.setText("Account password");
-//				}
-//			}
-//		};
-//		clientId.addFocusListener(focusOnId);
-//		clientPass.addFocusListener(focusOnPass);
-//		
-//		//shows * when clientPass (JTextField) is typed
-//		KeyListener hidePassListener = new KeyListener() {
-//			@Override
-//			public void keyTyped(KeyEvent e) {
-//				// TODO Auto-generated method stub
-//			}
-//			@Override
-//			public void keyPressed(KeyEvent e) {
-//				// TODO Auto-generated method stub
-//			}
-//			@Override
-//			public void keyReleased(KeyEvent e) {
-//				// TODO Auto-generated method stub
-//			}
-//		};
-		
 	}
 	
 	private void loadIndexJButtons() {
@@ -260,12 +215,18 @@ public class Window extends JFrame{
 		accountPanel.setLayout(null); //frees panel layout
 		
 		//gets the current BankAccount and Client (user)
-		userAccount = getUserAccount(userId,pass);
+		userAccount = getUserAccount(userId,pass); 
 		user = userAccount.getAccountClient();
 		
 		//loads all components for account JPanel
 		loadAccountJLabels();
 		loadAccountJButtons();
+		
+		//the next panel will only be dislplayed when btn.actionListener happens
+		//(initially with setVisble(false) => the event will change this to "true"
+		loadDepositPanel();
+		loadBalancePanel();
+		loadWithdrawPanel();
 	}
 	
 	//looks for a client's bank account and returns it
@@ -331,15 +292,219 @@ public class Window extends JFrame{
 		exitBtn.setBounds(300,530,200,20);
 		
 		//let's add all buttons
+		accountPanel.add(depositBtn);
 		accountPanel.add(balanceBtn);
 		accountPanel.add(withdrawBtn);
-		accountPanel.add(depositBtn);
 		accountPanel.add(exitBtn);
 		
 		//buttons action listeners
+
+		//deposit ActionListener
+		ActionListener depositActionListener = new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				balancePanel.setVisible(false);
+				withdrawPanel.setVisible(false);
+				depositPanel.setVisible(true);
+			}
+		};
+		depositBtn.addActionListener(depositActionListener);
 		
+		//balance actioon listener
+		ActionListener balanceActionListener = new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				depositPanel.setVisible(false);
+				balancePanel.setVisible(true);
+				withdrawPanel.setVisible(false);
+			}
+		};
+		balanceBtn.addActionListener(balanceActionListener);
+		
+		//withdraw action listener
+		ActionListener withdrawActionListener = new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				depositPanel.setVisible(false);
+				balancePanel.setVisible(false);
+				withdrawPanel.setVisible(true);
+			}
+		};
+		withdrawBtn.addActionListener(withdrawActionListener);
 	}
 	
+	
+	
+// DEPOSIT , BALANCE & WITHDRAW PANELS + COMPONENTS
+	
+	//deposit panel + components
+	private void loadDepositPanel() {
+		depositPanel = new JPanel();
+		depositPanel.setBounds(80,260,640,240);
+		depositPanel.setOpaque(true);
+		depositPanel.setBackground(Color.white);
+		depositPanel.setLayout(null);
+		depositPanel.setVisible(false);
+		
+		//load all components
+		//txt label for deposit panel
+		loadDepositTxtLabel();
+		//txt field for deposit panel (user input)
+		loadDepositTxtField();
+		//button for deposit panel (action listener)
+		loadDepositButton();
+		
+		accountPanel.add(depositPanel);
+	}
+	
+	private void loadDepositTxtLabel() {
+		JLabel depositTxtLabel = new JLabel("Deposit");
+		depositTxtLabel.setBounds(30,88,100,20);
+		depositTxtLabel.setFont(systemFont);
+		
+		userWarning = new JLabel("Check this field");
+		userWarning.setFont(warningFont);
+		userWarning.setForeground(Color.red);
+		userWarning.setBounds(30,132,100,20);
+		userWarning.setVisible(false);
+		
+		userSuccess = new JLabel("Done");
+		userSuccess.setFont(warningFont);
+		userSuccess.setForeground(Color.blue);
+		userSuccess.setBounds(30,132,100,20);
+		userSuccess.setVisible(false);
+		
+		depositPanel.add(depositTxtLabel);
+		depositPanel.add(userWarning);
+		depositPanel.add(userSuccess);
+		
+	}
+
+	private void loadDepositTxtField() {
+		depositTxtField = new JTextField(); //initializes deposit text field => user'll input deposit here
+		depositTxtField.setBounds(30,110,360,20);
+		depositTxtField.setFont(inputFont);
+		
+		depositPanel.add(depositTxtField);
+	}
+	
+	private void loadDepositButton() {
+		JButton depositBtn = new JButton("Go");
+		depositBtn.setBounds(410,110,200,20);
+		
+		depositPanel.add(depositBtn);
+		
+		//depositBtn ActionListener development
+		ActionListener depositBtnListener = new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				userWarning.setVisible(false);
+				userSuccess.setVisible(false);
+				//the try-catch will get the NumberFormatException if user doesn't input a double value
+				try {
+					if(!checkEmptyTextField(depositTxtField)) {
+						makeDeposit(depositTxtField.getText());
+						depositTxtField.setText("");
+						userSuccess.setVisible(true);
+						System.out.println("success");
+						System.out.println("new balance: "+userAccount.getBalance());
+					}else {
+						userWarning.setVisible(true);
+					}
+				}catch(NumberFormatException nEx) {
+					depositTxtField.setText("");
+					userWarning.setVisible(true);
+					System.out.println("number format exception");
+				}
+			}
+		};
+		depositBtn.addActionListener(depositBtnListener);
+	}
+	
+	//checks if a text field is empty -- FALSE 
+	private boolean checkEmptyTextField(JTextField textField){
+		boolean check = true;
+		if(!textField.getText().equals(""))
+			//if the text field has any String in it=> returns false
+			check = false;
+		return check;
+	}
+	
+	//sets new balance = old balance + deposit
+	//may throw a NumberFormatException when converting the String into a double
+	private void makeDeposit(String depositInput) throws NumberFormatException {
+		double deposit = Double.parseDouble(depositInput);
+		userAccount.setBalance(userAccount.getBalance() + deposit);
+	}
+	
+	
+	
+	//balance panel + components
+	private void loadBalancePanel() {
+		balancePanel = new JPanel();
+		balancePanel.setBounds(80,260,640,240);
+		balancePanel.setOpaque(true);
+		balancePanel.setBackground(Color.white);
+		balancePanel.setVisible(false);
+		
+		accountPanel.add(balancePanel);
+	}
+	
+	
+	//withdraw panel + components
+	private void loadWithdrawPanel() {
+		withdrawPanel = new JPanel();
+		withdrawPanel.setBounds(80,260,640,240);
+		withdrawPanel.setOpaque(true);
+		withdrawPanel.setBackground(Color.white);
+		withdrawPanel.setLayout(null);
+		withdrawPanel.setVisible(false);
+		
+		//load all components
+		//loads text labels
+		loadWithdrawTextLabels();
+		//loads withdraw text field - user will input a value here
+		loadWithdrawTextField();
+		//loads withdraw button + ActionListener for it
+		loadWithdrawButton();
+		
+		accountPanel.add(withdrawPanel);
+	}
+	
+	private void loadWithdrawTextLabels() {
+		JLabel withdrawLabel = new JLabel("Withdraw");
+		withdrawLabel.setBounds(30,88,100,20);
+		withdrawLabel.setFont(systemFont);
+		
+		userWarning = new JLabel("Check this field");
+		userWarning.setFont(warningFont);
+		userWarning.setForeground(Color.red);
+		userWarning.setBounds(30,132,100,20);
+		userWarning.setVisible(false);
+		
+		userSuccess = new JLabel("Done");
+		userSuccess.setFont(warningFont);
+		userSuccess.setForeground(Color.blue);
+		userSuccess.setBounds(30,132,100,20);
+		userSuccess.setVisible(false);
+		
+		withdrawPanel.add(withdrawLabel);
+		withdrawPanel.add(userWarning);
+		withdrawPanel.add(userSuccess);
+	}
+	
+	private void loadWithdrawTextField() {
+		withdrawTxtField = new JTextField(); //initializes withdraw text field => user'll input wuthdrawment here
+		withdrawTxtField.setBounds(30,110,360,20);
+		withdrawTxtField.setFont(inputFont);
+		
+		depositPanel.add(withdrawTxtField);
+	}
+	
+	private void loadWithdrawButton() {
+		JButton withdrawButton = new JButton("Withdraw");
+		
+	}
 }
 
 

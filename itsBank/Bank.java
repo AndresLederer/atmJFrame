@@ -12,6 +12,16 @@ public class Bank {
 	
 	//main method
 	public static void main(String[] args) throws ParseException  {
+//		String s = "1234cinco";
+//		if(!s.equals("")) {
+//			System.out.println("no vacio");
+//		}
+//		try {
+//			double id = Double.parseDouble(s);
+//			System.out.println(id);
+//		}catch (NumberFormatException nEx) {
+//			System.out.println("el id no es double 100%");
+//		}
 		try {
 			//4 already initialized clients
 			bankClients.add(new Client("Benjamin","Juarez","JB Justo Street 2412","40719256",new SimpleDateFormat("dd/MM/yyyy").parse("10/05/1997")));
