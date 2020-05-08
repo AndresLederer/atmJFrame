@@ -40,7 +40,7 @@ public class Client {
 	}
 	
 	//returns birth Date in a String
-	private String getBirthString() {
+	public String getBirthString() {
 		SimpleDateFormat spd = new SimpleDateFormat("dd/MM/yyyy");
 		String birth = spd.format(getBirth());
 		return birth;

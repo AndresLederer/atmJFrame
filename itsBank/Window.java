@@ -13,6 +13,7 @@ public class Window extends JFrame{
 	private static ArrayList<BankAccount> accounts;
 	private static ArrayList<Client> clients;
 	
+	//Fonts
 	private Font titleFont = new Font("arial",3,25);
 //	private Font tipFont = new Font("arial",2,12);
 	private Font inputFont = new Font("arial",2,12);
@@ -20,10 +21,12 @@ public class Window extends JFrame{
 	private Font greetFont = new Font("arial",3,12);
 	private Font systemFont = new Font("arial",1,12);
 	
+	//INDEX PANEL
 	private JPanel indexPanel; //index JPanel
 	private JTextField clientId; //only in indexPanel
 	private JPasswordField clientPass; //only in indexPanel
 	
+	//ACCOUNT PANEL
 	private JPanel accountPanel; //account JPanel
 	private Client user; // client using the sftw
 	private BankAccount userAccount; //BankAccount of user
@@ -31,16 +34,18 @@ public class Window extends JFrame{
 	//DEPOSIT AUXILIARIES
 	private JPanel depositPanel; //shows panel for deposits
 	private JTextField depositTxtField; //user will input their deposit here
+	private JLabel depositUserWarning;
+	private JLabel depositUserSuccess;
 	
 	//BALANCE AUXILIARIES
 	private JPanel balancePanel; //shows panel for withdraw
-	
+	private JLabel balanceDouble;
 	//WITHDRAW AUXILIARIES
 	private JPanel withdrawPanel; //shows balance
 	private JTextField withdrawTxtField;
-	
-	private JLabel userWarning; //used in deposit and withdraw panels 
-	private JLabel userSuccess; //used in deposit,withdraw and balance panels
+	private JLabel withdrawUserWarning; //used in deposit and withdraw panels 
+	private JLabel withdrawUserSuccess; //used in deposit,withdraw and balance panels
+	private JLabel withdrawBalanceWarning;
 	
 	//constructor
 	public Window(ArrayList<Client> bankClients,ArrayList<BankAccount> bankAccounts) {
@@ -306,6 +311,7 @@ public class Window extends JFrame{
 				balancePanel.setVisible(false);
 				withdrawPanel.setVisible(false);
 				depositPanel.setVisible(true);
+				clearAllUserMassages();
 			}
 		};
 		depositBtn.addActionListener(depositActionListener);
@@ -315,8 +321,10 @@ public class Window extends JFrame{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				depositPanel.setVisible(false);
-				balancePanel.setVisible(true);
 				withdrawPanel.setVisible(false);
+				balancePanel.setVisible(true);
+				balanceDouble.setText(String.format("$ %.2f",userAccount.getBalance()));
+				clearAllUserMassages();
 			}
 		};
 		balanceBtn.addActionListener(balanceActionListener);
@@ -328,9 +336,25 @@ public class Window extends JFrame{
 				depositPanel.setVisible(false);
 				balancePanel.setVisible(false);
 				withdrawPanel.setVisible(true);
+				clearAllUserMassages();
 			}
 		};
 		withdrawBtn.addActionListener(withdrawActionListener);
+		
+		ActionListener exitActionListener = new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				depositPanel.setVisible(false);
+				balancePanel.setVisible(false);
+				withdrawPanel.setVisible(false);
+				accountPanel.setVisible(false);
+				indexPanel.setVisible(true);
+				clientId.setText("");
+				clientPass.setText("");
+				clearAllUserMassages();
+			}
+		};
+		exitBtn.addActionListener(exitActionListener);
 	}
 	
 	
@@ -362,21 +386,21 @@ public class Window extends JFrame{
 		depositTxtLabel.setBounds(30,88,100,20);
 		depositTxtLabel.setFont(systemFont);
 		
-		userWarning = new JLabel("Check this field");
-		userWarning.setFont(warningFont);
-		userWarning.setForeground(Color.red);
-		userWarning.setBounds(30,132,100,20);
-		userWarning.setVisible(false);
+		depositUserWarning = new JLabel("Check this field");
+		depositUserWarning.setFont(warningFont);
+		depositUserWarning.setForeground(Color.red);
+		depositUserWarning.setBounds(30,132,100,20);
+		depositUserWarning.setVisible(false);
 		
-		userSuccess = new JLabel("Done");
-		userSuccess.setFont(warningFont);
-		userSuccess.setForeground(Color.blue);
-		userSuccess.setBounds(30,132,100,20);
-		userSuccess.setVisible(false);
+		depositUserSuccess = new JLabel("Done");
+		depositUserSuccess.setFont(warningFont);
+		depositUserSuccess.setForeground(Color.blue);
+		depositUserSuccess.setBounds(30,132,100,20);
+		depositUserSuccess.setVisible(false);
 		
 		depositPanel.add(depositTxtLabel);
-		depositPanel.add(userWarning);
-		depositPanel.add(userSuccess);
+		depositPanel.add(depositUserWarning);
+		depositPanel.add(depositUserSuccess);
 		
 	}
 
@@ -398,23 +422,26 @@ public class Window extends JFrame{
 		ActionListener depositBtnListener = new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				userWarning.setVisible(false);
-				userSuccess.setVisible(false);
+//				userWarning.setVisible(false);
+//				userSuccess.setVisible(false);
 				//the try-catch will get the NumberFormatException if user doesn't input a double value
 				try {
-					if(!checkEmptyTextField(depositTxtField)) {
+					if(!emptyTextField(depositTxtField)) {
 						makeDeposit(depositTxtField.getText());
 						depositTxtField.setText("");
-						userSuccess.setVisible(true);
-						System.out.println("success");
-						System.out.println("new balance: "+userAccount.getBalance());
+						depositUserWarning.setVisible(false);
+						depositUserSuccess.setVisible(true);
+//						System.out.println("success");
+//						System.out.println("new balance: "+userAccount.getBalance());
 					}else {
-						userWarning.setVisible(true);
+						depositUserSuccess.setVisible(false);
+						depositUserWarning.setVisible(true);
 					}
 				}catch(NumberFormatException nEx) {
 					depositTxtField.setText("");
-					userWarning.setVisible(true);
-					System.out.println("number format exception");
+					depositUserSuccess.setVisible(false);
+					depositUserWarning.setVisible(true);
+//					System.out.println("number format exception");
 				}
 			}
 		};
@@ -422,7 +449,7 @@ public class Window extends JFrame{
 	}
 	
 	//checks if a text field is empty -- FALSE 
-	private boolean checkEmptyTextField(JTextField textField){
+	private boolean emptyTextField(JTextField textField){
 		boolean check = true;
 		if(!textField.getText().equals(""))
 			//if the text field has any String in it=> returns false
@@ -439,16 +466,61 @@ public class Window extends JFrame{
 	
 	
 	
+	
+	
+	
 	//balance panel + components
 	private void loadBalancePanel() {
 		balancePanel = new JPanel();
 		balancePanel.setBounds(80,260,640,240);
 		balancePanel.setOpaque(true);
 		balancePanel.setBackground(Color.white);
+		balancePanel.setLayout(null);
 		balancePanel.setVisible(false);
+		
+		
+		//load all components
+		//loads text JLabels
+		loadBalanceTextLabels();
 		
 		accountPanel.add(balancePanel);
 	}
+	
+	private void loadBalanceTextLabels() {
+		 JLabel balanceTitle = new JLabel("Account Balance");
+		 balanceDouble = new JLabel(String.format("$ %.2f",userAccount.getBalance()));
+		 
+		 balanceTitle.setBounds(100,20,200,70);
+		 balanceDouble.setBounds(100,120,200,100);
+		 balanceTitle.setFont(new Font("arial",Font.BOLD,20));
+		 balanceDouble.setFont(new Font("arial",Font.BOLD,30));
+		 balanceTitle.setForeground(Color.white);
+		 balanceDouble.setForeground(Color.white);
+		 balanceTitle.setOpaque(true);
+		 balanceTitle.setBackground(Color.gray);
+		 balanceDouble.setOpaque(true);
+		 balanceDouble.setBackground(Color.gray);
+		 balanceTitle.setHorizontalAlignment(SwingConstants.CENTER);
+		 balanceDouble.setHorizontalAlignment(SwingConstants.CENTER);
+		 
+		 
+		 JLabel clientTitle = new JLabel("Account Owner");
+		 JLabel clientFullName = new JLabel(user.getLastName()+", "+user.getName());
+		 JLabel clientAddress = new JLabel(user.getAddress());
+		 JLabel clientId = new JLabel(user.getPersonalId());
+		 JLabel clientBirth = new JLabel(user.getBirthString());
+		 
+		 
+		 balancePanel.add(balanceTitle);
+		 balancePanel.add(balanceDouble);
+//		 balancePanel.add(clientTitle);
+//		 balancePanel.add(clientFullName);
+//		 balancePanel.add(clientAddress);
+//		 balancePanel.add(clientId);
+//		 balancePanel.add(clientBirth);
+	}
+	
+	
 	
 	
 	//withdraw panel + components
@@ -476,21 +548,28 @@ public class Window extends JFrame{
 		withdrawLabel.setBounds(30,88,100,20);
 		withdrawLabel.setFont(systemFont);
 		
-		userWarning = new JLabel("Check this field");
-		userWarning.setFont(warningFont);
-		userWarning.setForeground(Color.red);
-		userWarning.setBounds(30,132,100,20);
-		userWarning.setVisible(false);
+		withdrawUserWarning = new JLabel("Check this field");
+		withdrawUserWarning.setFont(warningFont);
+		withdrawUserWarning.setForeground(Color.red);
+		withdrawUserWarning.setBounds(30,132,100,20);
+		withdrawUserWarning.setVisible(false);
 		
-		userSuccess = new JLabel("Done");
-		userSuccess.setFont(warningFont);
-		userSuccess.setForeground(Color.blue);
-		userSuccess.setBounds(30,132,100,20);
-		userSuccess.setVisible(false);
+		withdrawUserSuccess = new JLabel("Done");
+		withdrawUserSuccess.setFont(warningFont);
+		withdrawUserSuccess.setForeground(Color.blue);
+		withdrawUserSuccess.setBounds(30,132,100,20);
+		withdrawUserSuccess.setVisible(false);
+		
+		withdrawBalanceWarning = new JLabel("Not enough money in your account");
+		withdrawBalanceWarning.setFont(warningFont);
+		withdrawBalanceWarning.setForeground(Color.red);
+		withdrawBalanceWarning.setBounds(30,132,200,20);
+		withdrawBalanceWarning.setVisible(false);
 		
 		withdrawPanel.add(withdrawLabel);
-		withdrawPanel.add(userWarning);
-		withdrawPanel.add(userSuccess);
+		withdrawPanel.add(withdrawUserWarning);
+		withdrawPanel.add(withdrawUserSuccess);
+		withdrawPanel.add(withdrawBalanceWarning);
 	}
 	
 	private void loadWithdrawTextField() {
@@ -498,12 +577,79 @@ public class Window extends JFrame{
 		withdrawTxtField.setBounds(30,110,360,20);
 		withdrawTxtField.setFont(inputFont);
 		
-		depositPanel.add(withdrawTxtField);
+		withdrawPanel.add(withdrawTxtField);
 	}
 	
 	private void loadWithdrawButton() {
-		JButton withdrawButton = new JButton("Withdraw");
+		JButton withdrawBtn = new JButton("Withdraw");
+		withdrawBtn.setBounds(410,110,200,20);
 		
+		withdrawPanel.add(withdrawBtn);
+		
+		ActionListener withdrawBtnListener = new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent a) {
+				try {
+					//if there's sth written as the withdraw input
+					if(!emptyTextField(withdrawTxtField)) {
+						//if the withdraw is successful => shows a success massage
+						if(makeWithdraw(withdrawTxtField.getText())) {
+							withdrawUserWarning.setVisible(false);
+							withdrawBalanceWarning.setVisible(false);
+							withdrawUserSuccess.setVisible(true);
+						}else { //if there's not enough money to make the withdraw => shows a warning
+							withdrawUserWarning.setVisible(false);
+							withdrawUserSuccess.setVisible(false);
+							withdrawBalanceWarning.setVisible(true);
+						}
+						withdrawTxtField.setText("");
+					}else { //if the withdraw input is empty
+						withdrawUserSuccess.setVisible(false);
+						withdrawBalanceWarning.setVisible(false);
+						withdrawUserWarning.setVisible(true);
+					}
+				}catch (NumberFormatException nEx) {
+					withdrawTxtField.setText("");
+					withdrawBalanceWarning.setVisible(false);
+					withdrawUserSuccess.setVisible(false);
+					withdrawUserWarning.setVisible(true);
+				}
+			}
+		};
+		withdrawBtn.addActionListener(withdrawBtnListener);
+	}
+	
+	//checks if there's enough money into the account. If so, goes on and sets a new account balance
+	private boolean makeWithdraw(String withdrawInput) throws NumberFormatException {
+		boolean success = false;
+		double withdraw = Double.parseDouble(withdrawInput);
+		if(checkWithdrawAmount(withdraw)) {
+			userAccount.setBalance(userAccount.getBalance() - withdraw);
+			success = true;
+		}
+		return success;
+	}
+	
+	//checks if there's enough money into the account for the withdraw input
+	private boolean checkWithdrawAmount(double withdrawInput) {
+		boolean check = false;
+		if(userAccount.getBalance() >= withdrawInput)
+			check = true;
+		return check;
+	}
+	
+	
+	
+	
+	
+	
+	//clears out all massages for the user
+	private void clearAllUserMassages() {
+		depositUserSuccess.setVisible(false);
+		depositUserWarning.setVisible(false);
+		withdrawUserSuccess.setVisible(false);
+		withdrawUserWarning.setVisible(false);
+		withdrawBalanceWarning.setVisible(false);
 	}
 }
 
