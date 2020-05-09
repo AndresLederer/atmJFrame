@@ -491,33 +491,68 @@ public class Window extends JFrame{
 		 balanceDouble = new JLabel(String.format("$ %.2f",userAccount.getBalance()));
 		 
 		 balanceTitle.setBounds(100,20,200,70);
-		 balanceDouble.setBounds(100,120,200,100);
 		 balanceTitle.setFont(new Font("arial",Font.BOLD,20));
-		 balanceDouble.setFont(new Font("arial",Font.BOLD,30));
 		 balanceTitle.setForeground(Color.white);
-		 balanceDouble.setForeground(Color.white);
 		 balanceTitle.setOpaque(true);
 		 balanceTitle.setBackground(Color.gray);
+		 balanceTitle.setHorizontalAlignment(SwingConstants.CENTER);
+		 
+		 balanceDouble.setBounds(100,120,200,100);
+		 balanceDouble.setFont(new Font("arial",Font.BOLD,30));
+		 balanceDouble.setForeground(Color.white);
 		 balanceDouble.setOpaque(true);
 		 balanceDouble.setBackground(Color.gray);
-		 balanceTitle.setHorizontalAlignment(SwingConstants.CENTER);
 		 balanceDouble.setHorizontalAlignment(SwingConstants.CENTER);
 		 
 		 
 		 JLabel clientTitle = new JLabel("Account Owner");
 		 JLabel clientFullName = new JLabel(user.getLastName()+", "+user.getName());
 		 JLabel clientAddress = new JLabel(user.getAddress());
-		 JLabel clientId = new JLabel(user.getPersonalId());
+		 JLabel clientId = new JLabel("ID "+user.getPersonalId());
 		 JLabel clientBirth = new JLabel(user.getBirthString());
 		 
+		 clientTitle.setBounds(340,20,200,70);
+		 clientTitle.setFont(new Font("arial",Font.BOLD,20));
+		 clientTitle.setForeground(Color.white);
+		 clientTitle.setOpaque(true);
+		 clientTitle.setBackground(Color.gray);
+		 clientTitle.setHorizontalAlignment(SwingConstants.CENTER);
+		 
+		 clientFullName.setBounds(340,120,200,25);
+		 clientFullName.setFont(systemFont);
+		 clientFullName.setForeground(Color.white);
+		 clientFullName.setOpaque(true);
+		 clientFullName.setBackground(Color.gray);
+		 clientFullName.setHorizontalAlignment(SwingConstants.CENTER);
+		 
+		 clientAddress.setBounds(340,145,200,25);
+		 clientAddress.setFont(systemFont);
+		 clientAddress.setForeground(Color.white);
+		 clientAddress.setOpaque(true);
+		 clientAddress.setBackground(Color.gray);
+		 clientAddress.setHorizontalAlignment(SwingConstants.CENTER);
+		 
+		 clientId.setBounds(340,170,200,25);
+		 clientId.setFont(systemFont);
+		 clientId.setForeground(Color.white);
+		 clientId.setOpaque(true);
+		 clientId.setBackground(Color.gray);
+		 clientId.setHorizontalAlignment(SwingConstants.CENTER);
+		 
+		 clientBirth.setBounds(340,195,200,25);
+		 clientBirth.setFont(systemFont);
+		 clientBirth.setForeground(Color.white);
+		 clientBirth.setOpaque(true);
+		 clientBirth.setBackground(Color.gray);
+		 clientBirth.setHorizontalAlignment(SwingConstants.CENTER);
 		 
 		 balancePanel.add(balanceTitle);
 		 balancePanel.add(balanceDouble);
-//		 balancePanel.add(clientTitle);
-//		 balancePanel.add(clientFullName);
-//		 balancePanel.add(clientAddress);
-//		 balancePanel.add(clientId);
-//		 balancePanel.add(clientBirth);
+		 balancePanel.add(clientTitle);
+		 balancePanel.add(clientFullName);
+		 balancePanel.add(clientAddress);
+		 balancePanel.add(clientId);
+		 balancePanel.add(clientBirth);
 	}
 	
 	
