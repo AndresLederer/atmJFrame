@@ -15,18 +15,21 @@ public class Window extends JFrame{
 	
 	//Fonts
 	private Font titleFont = new Font("arial",3,25);
-//	private Font tipFont = new Font("arial",2,12);
 	private Font inputFont = new Font("arial",2,12);
 	private Font warningFont = new Font("arial",1,10);
 	private Font greetFont = new Font("arial",3,12);
 	private Font systemFont = new Font("arial",1,12);
 	
-	//INDEX PANEL
+	//<<< INDEX PANEL >>>
 	private JPanel indexPanel; //index JPanel
 	private JTextField clientId; //only in indexPanel
 	private JPasswordField clientPass; //only in indexPanel
+	private JLabel clientIdWar;	//massage
+	private JLabel accountPassWar; //massage
+	private JLabel notAccountFound1; //massage
+	private JLabel notAccountFound2; //massage
 	
-	//ACCOUNT PANEL
+	//<<< ACCOUNT PANEL >>>
 	private JPanel accountPanel; //account JPanel
 	private Client user; // client using the sftw
 	private BankAccount userAccount; //BankAccount of user
@@ -40,12 +43,29 @@ public class Window extends JFrame{
 	//BALANCE AUXILIARIES
 	private JPanel balancePanel; //shows panel for withdraw
 	private JLabel balanceDouble;
+	
 	//WITHDRAW AUXILIARIES
 	private JPanel withdrawPanel; //shows balance
 	private JTextField withdrawTxtField;
 	private JLabel withdrawUserWarning; //used in deposit and withdraw panels 
 	private JLabel withdrawUserSuccess; //used in deposit,withdraw and balance panels
 	private JLabel withdrawBalanceWarning;
+	
+	//<<< NEW ACCOUNT PANEL >>>
+	private JPanel newAccountPanel;
+	private JButton backBtn;
+	private JButton continueBtn;
+	
+	//CLIENT NEW ACCOUNT PANEL
+	private JPanel clientNewAccountPanel;
+	private JTextField firstName;
+	private JTextField lastName;
+	private JTextField address;
+	private JTextField personalId;
+	private JTextField birth;
+	
+	//NEW BANK ACCOUNT PANEL
+	private JPanel baNewAccountPanel;
 	
 	//constructor
 	public Window(ArrayList<Client> bankClients,ArrayList<BankAccount> bankAccounts) {
@@ -133,20 +153,21 @@ public class Window extends JFrame{
 		indexPanel.add(contactUsBtn);
 		
 		//client ID warning JLabel
-		JLabel clientIdWar = new JLabel();
+		clientIdWar = new JLabel();
 		clientIdWar.setBounds(300,230,150,10);
 		clientIdWar.setFont(warningFont);
 		clientIdWar.setForeground(Color.red);
 		indexPanel.add(clientIdWar);
+		
 		//account password warning JLabel
-		JLabel accountPassWar = new JLabel();
+		accountPassWar = new JLabel();
 		accountPassWar.setBounds(300,285,150,10);
 		accountPassWar.setFont(warningFont);
 		accountPassWar.setForeground(Color.red);
 		indexPanel.add(accountPassWar);
 		//Client id and password DO NOT match any bank account warning JLabel
-		JLabel notAccountFound1 = new JLabel();
-		JLabel notAccountFound2 = new JLabel();
+		notAccountFound1 = new JLabel();
+		notAccountFound2 = new JLabel();
 		notAccountFound1.setBounds(200,435,400,20);
 		notAccountFound2.setBounds(200,460,400,20);
 		notAccountFound1.setFont(warningFont);
@@ -158,6 +179,7 @@ public class Window extends JFrame{
 		indexPanel.add(notAccountFound1);
 		indexPanel.add(notAccountFound2);
 		
+		//go to my accouny btn action listener 
 		ActionListener goToMyAccAction = new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -196,6 +218,16 @@ public class Window extends JFrame{
 			}
 		};
 		goToMyAccountBtn.addActionListener(goToMyAccAction);
+		
+		//create account btn action listener
+		ActionListener newAccountListener = new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent ae) {
+				indexPanel.setVisible(false);
+				loadNewAccountPanel();
+			}
+		};
+		createAccountBtn.addActionListener(newAccountListener);
 	}
 	
 	//checks client personal ID && password for their account -- returns the number of clientID and password matches 
@@ -422,17 +454,12 @@ public class Window extends JFrame{
 		ActionListener depositBtnListener = new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-//				userWarning.setVisible(false);
-//				userSuccess.setVisible(false);
-				//the try-catch will get the NumberFormatException if user doesn't input a double value
 				try {
 					if(!emptyTextField(depositTxtField)) {
 						makeDeposit(depositTxtField.getText());
 						depositTxtField.setText("");
 						depositUserWarning.setVisible(false);
 						depositUserSuccess.setVisible(true);
-//						System.out.println("success");
-//						System.out.println("new balance: "+userAccount.getBalance());
 					}else {
 						depositUserSuccess.setVisible(false);
 						depositUserWarning.setVisible(true);
@@ -441,7 +468,6 @@ public class Window extends JFrame{
 					depositTxtField.setText("");
 					depositUserSuccess.setVisible(false);
 					depositUserWarning.setVisible(true);
-//					System.out.println("number format exception");
 				}
 			}
 		};
@@ -673,11 +699,6 @@ public class Window extends JFrame{
 		return check;
 	}
 	
-	
-	
-	
-	
-	
 	//clears out all massages for the user
 	private void clearAllUserMassages() {
 		depositUserSuccess.setVisible(false);
@@ -686,8 +707,150 @@ public class Window extends JFrame{
 		withdrawUserWarning.setVisible(false);
 		withdrawBalanceWarning.setVisible(false);
 	}
-}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	private void loadNewAccountPanel() {
+		newAccountPanel = new JPanel();
+		contentPane.add(newAccountPanel);
+		newAccountPanel.setLayout(null);
+		newAccountPanel.setVisible(true);
+		
+		//loads new account panel title (JLabel)
+		loadNewAccountTitle();
+		loadNewAccountButtons();
+		
+		//loads the 2 secondary panels 
+		loadClientNewAccountPanel(); //initially set as visible = true
+//		loadBaNewAccountPanel(); //initally set as visible = false
+	}
+	
+	private void loadNewAccountTitle() {
+		JLabel newAccountTitle = new JLabel("ITS BANK");
+		JLabel newAccountTitle2 = new JLabel("New Account");
+		
+		newAccountTitle.setBounds(200,80,400,50);
+		newAccountTitle.setHorizontalAlignment(SwingConstants.CENTER);
+		newAccountTitle.setFont(titleFont);
 
+		newAccountTitle2.setBounds(200,130,400,50);
+		newAccountTitle2.setHorizontalAlignment(SwingConstants.CENTER);
+		newAccountTitle2.setFont(greetFont);
+		
+		newAccountPanel.add(newAccountTitle);
+		newAccountPanel.add(newAccountTitle2);
+	}
+	
+	private void loadNewAccountButtons() {
+		backBtn = new JButton("Back");
+		continueBtn = new JButton("Continue");
+		
+		backBtn.setBounds(100,500,200,20);
+		
+		continueBtn.setBounds(500,500,200,20);
+		continueBtn.setEnabled(false);
+		
+		newAccountPanel.add(backBtn);
+		newAccountPanel.add(continueBtn);
+		
+		//back button action listener
+		ActionListener backBtnActionListener = new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent ae) {
+				//offs the new account panel
+				newAccountPanel.setVisible(false);
+				//ons the index panel
+				indexPanel.setVisible(true);
+				
+				//clears all the indexPanel's massages && textFields
+				clientIdWar.setText("");
+				accountPassWar.setText("");
+				notAccountFound1.setText("");
+				notAccountFound2.setText("");
+				clientId.setText("");
+				clientPass.setText("");
+			}
+		};
+		backBtn.addActionListener(backBtnActionListener);
+	}
+	
+	private void loadClientNewAccountPanel() {
+		clientNewAccountPanel = new JPanel();
+		
+		clientNewAccountPanel.setBounds(100,200,600,270);
+		clientNewAccountPanel.setLayout(null);
+		
+		loadClientNewAccountLabels();
+		loadClientNewAccountTxtFields();
+		
+		newAccountPanel.add(clientNewAccountPanel);
+	}
+	
+	private void loadClientNewAccountLabels() {
+		JLabel firstName = new JLabel("First name");
+		JLabel lastName = new JLabel("Last name");
+		JLabel personalId = new JLabel("Personal ID");
+		JLabel address = new JLabel("Address");
+		JLabel birth = new JLabel("Birth date");
+		
+		firstName.setBounds(200,0,200,20);
+		firstName.setFont(warningFont);
+		
+		lastName.setBounds(200,46,200,20);
+		lastName.setFont(warningFont);
+		
+		personalId.setBounds(200,92,200,20);
+		personalId.setFont(warningFont);
+		
+		address.setBounds(200,138,200,20);
+		address.setFont(warningFont);
+		
+		birth.setBounds(200,184,200,20);
+		birth.setFont(warningFont);
+		
+		clientNewAccountPanel.add(firstName);
+		clientNewAccountPanel.add(lastName);
+		clientNewAccountPanel.add(personalId);
+		clientNewAccountPanel.add(address);
+		clientNewAccountPanel.add(birth);
+	}
+	
+	private void loadClientNewAccountTxtFields() {
+		firstName = new JTextField();
+		lastName = new JTextField();
+		personalId = new JTextField();
+		address = new JTextField();
+		birth = new JTextField();
+		
+		firstName.setBounds(200,23,200,20);
+		firstName.setFont(inputFont);
+		
+		lastName.setBounds(200,69,200,20);
+		lastName.setFont(inputFont);
+		
+		personalId.setBounds(200,115,200,20);
+		personalId.setFont(inputFont);
+		
+		address.setBounds(200,161,200,20);
+		address.setFont(inputFont);
+		
+		birth.setBounds(200,207,200,20);
+		birth.setFont(inputFont);
+		
+		clientNewAccountPanel.add(firstName);
+		clientNewAccountPanel.add(lastName);
+		clientNewAccountPanel.add(personalId);
+		clientNewAccountPanel.add(address);
+		clientNewAccountPanel.add(birth);
+	}
+}
 
 
 

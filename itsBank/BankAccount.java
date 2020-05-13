@@ -8,6 +8,7 @@ public class BankAccount {
 	private final UUID accountUuid;
 	private double balance;
 	private String password;
+	
 	//setters
 	public void setBalance(double balance) {
 		this.balance = balance;
