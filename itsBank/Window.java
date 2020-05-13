@@ -5,6 +5,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.text.*;
 
 public class Window extends JFrame{
 	//atributes
@@ -63,6 +66,9 @@ public class Window extends JFrame{
 	private JTextField address;
 	private JTextField personalId;
 	private JTextField birth;
+	private JLabel birthWarnig;
+	private JLabel completeFieldsWarning;
+	private SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 	
 	//NEW BANK ACCOUNT PANEL
 	private JPanel baNewAccountPanel;
@@ -729,7 +735,7 @@ public class Window extends JFrame{
 		
 		//loads the 2 secondary panels 
 		loadClientNewAccountPanel(); //initially set as visible = true
-//		loadBaNewAccountPanel(); //initally set as visible = false
+		loadBaNewAccountPanel(); //initally set as visible = false
 	}
 	
 	private void loadNewAccountTitle() {
@@ -753,9 +759,7 @@ public class Window extends JFrame{
 		continueBtn = new JButton("Continue");
 		
 		backBtn.setBounds(100,500,200,20);
-		
 		continueBtn.setBounds(500,500,200,20);
-		continueBtn.setEnabled(false);
 		
 		newAccountPanel.add(backBtn);
 		newAccountPanel.add(continueBtn);
@@ -779,6 +783,30 @@ public class Window extends JFrame{
 			}
 		};
 		backBtn.addActionListener(backBtnActionListener);
+		
+//		continue button action listener
+		ActionListener continueBtnActionListener = new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent ae) {
+				try {
+					//checks there are no blank inputs && corect birth date format (SimpleDateFormat) 
+					if(checkNewAccountInput()){
+						//checks the birht input format is correct -- if not throws ParseException
+						checkValidBirth(birth.getText());
+						clientNewAccountPanel.setVisible(false);
+						baNewAccountPanel.setVisible(true);
+						backBtn.setVisible(false);
+						continueBtn.setVisible(false);
+					}else{
+					//show "fill all fields" warning
+					completeFieldsWarning.setVisible(true);
+					}
+				}catch(ParseException pEx){ //invalid birth date format (SimpleDateFormat)
+					birthWarnig.setVisible(true);
+				}
+			}
+		};
+		continueBtn.addActionListener(continueBtnActionListener);
 	}
 	
 	private void loadClientNewAccountPanel() {
@@ -798,7 +826,10 @@ public class Window extends JFrame{
 		JLabel lastName = new JLabel("Last name");
 		JLabel personalId = new JLabel("Personal ID");
 		JLabel address = new JLabel("Address");
-		JLabel birth = new JLabel("Birth date");
+		JLabel birth = new JLabel("Birth (dd/mm/yyyy)");
+		
+		birthWarnig = new JLabel("Invalid format");
+		completeFieldsWarning = new JLabel("Please complete all fields to continue");
 		
 		firstName.setBounds(200,0,200,20);
 		firstName.setFont(warningFont);
@@ -815,11 +846,24 @@ public class Window extends JFrame{
 		birth.setBounds(200,184,200,20);
 		birth.setFont(warningFont);
 		
+		birthWarnig.setBounds(200,230,200,20);
+		birthWarnig.setFont(warningFont);
+		birthWarnig.setForeground(Color.red);
+		birthWarnig.setVisible(false);
+		
+		completeFieldsWarning.setBounds(200,251,200,20);
+		completeFieldsWarning.setFont(warningFont);
+		completeFieldsWarning.setForeground(Color.blue);
+		completeFieldsWarning.setHorizontalAlignment(SwingConstants.CENTER);
+		completeFieldsWarning.setVisible(false);
+		
 		clientNewAccountPanel.add(firstName);
 		clientNewAccountPanel.add(lastName);
 		clientNewAccountPanel.add(personalId);
 		clientNewAccountPanel.add(address);
 		clientNewAccountPanel.add(birth);
+		clientNewAccountPanel.add(birthWarnig);
+		clientNewAccountPanel.add(completeFieldsWarning);
 	}
 	
 	private void loadClientNewAccountTxtFields() {
@@ -849,6 +893,88 @@ public class Window extends JFrame{
 		clientNewAccountPanel.add(personalId);
 		clientNewAccountPanel.add(address);
 		clientNewAccountPanel.add(birth);
+		
+		//focus listener clears the birth warning when birth field gains focus
+		FocusListener birthFocusListener = new FocusListener() {
+			@Override
+			public void focusGained(FocusEvent e) {
+				birthWarnig.setVisible(false);
+			}
+			
+			@Override
+			public void focusLost(FocusEvent e) {
+				// TODO Auto-generated method stub
+			}
+		};
+		birth.addFocusListener(birthFocusListener);
+	}
+	
+	private boolean checkNewAccountInput() {
+		boolean check = true;
+		if(firstName.getText().equals("")||lastName.getText().equals("")||personalId.getText().equals("")||address.getText().equals("")||birth.getText().equals("")) {
+			check = false;
+		}
+		return check;
+	}
+	
+	private void checkValidBirth(String birth) throws ParseException{
+		Date inputDate = dateFormat.parse(birth);
+		if(!dateFormat.format(inputDate).equals(birth)) {
+			throw new ParseException("invalid SimpleDateFormat",0);
+		}
+	}
+	
+	
+	
+	
+	
+	//final new bank account panel
+	private void loadBaNewAccountPanel() {
+		baNewAccountPanel = new JPanel();
+		
+		baNewAccountPanel.setBounds(100,200,600,270);
+		baNewAccountPanel.setLayout(null);
+		baNewAccountPanel.setVisible(false);
+		
+		loadBaPasswordLabel();
+		loadBaPasswordField();
+		loadBaButtons();
+		
+		newAccountPanel.add(baNewAccountPanel);
+	}
+	
+	private void loadBaPasswordLabel() {
+		JLabel passLabel = new JLabel("New account password");
+		
+		passLabel.setBounds(200,0,200,20);
+		passLabel.setFont(warningFont);
+		passLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		
+		baNewAccountPanel.add(passLabel);
+	}
+	
+	private void loadBaPasswordField() {
+		JTextField newAccPass = new JTextField();
+		
+		newAccPass.setBounds(200,23,200,20);
+		newAccPass.setFont(inputFont);
+		
+		baNewAccountPanel.add(newAccPass);
+	}
+	
+	private void loadBaButtons() {
+		JButton finishBtn = new JButton("Finish");
+		JButton cancelBtn = new JButton("Cancel");
+		
+		finishBtn.setBounds(200,73,200,30);
+		cancelBtn.setBounds(200,118,200,30);
+		
+		baNewAccountPanel.add(finishBtn);
+		baNewAccountPanel.add(cancelBtn);
+		
+		//finish button action listener
+		
+		//cancel button action listener
 	}
 }
 
