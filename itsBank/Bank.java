@@ -34,42 +34,6 @@ public class Bank {
 			System.out.println("parse exception!");
 		}
 	}
-	
-//	//checks client personal ID && password for their account -- returns true if the password matches the client password account
-//	private static boolean checkPassword(String password,String personalId) {
-//		boolean access = false;
-//		for(BankAccount b : bankAccounts) {
-//			if(b.getAccountClient().getPersonalId().equals(personalId) && b.getPassword().equals(password)) {
-//				access = true;
-//			}
-//		}
-//		return access;
-//	}
-	//serches (by a personal ID client) and returns a Bank Account -- returns NULL if !found
-	private static BankAccount getAccount(String personalIdClient) {
-		BankAccount baSearched = null;
-		for(BankAccount b : bankAccounts) {
-			if(b.getAccountClient().getPersonalId().equals(personalIdClient)) {
-				baSearched = b;
-			}
-		}
-		return baSearched;
-	}
-	
-	//shows a Bank Account in CMD
-	private static void showAccount(BankAccount ba) {
-		System.out.println(ba.toString());
-	}
-	
-	//shows all Bank Accounts in CMD
-	private static void showAllAccounts() {
-		System.out.println("<<< ALL BANK ACCOUNTS >>>");
-		for(BankAccount b : bankAccounts) {
-			System.out.println(b.toString());
-		}
-	}
-	
-	
 }
 
 

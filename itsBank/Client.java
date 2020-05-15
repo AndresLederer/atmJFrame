@@ -62,14 +62,20 @@ public class Client {
 		return string;
 	}
 	
-
-
-
-
-
-
-
-
+	//equals() method @Override
+	@Override
+	public boolean equals(Object obj) {
+		if(obj instanceof Client) {
+			Client anOtherClient = (Client) obj;
+			if(this.personalId.equals(anOtherClient.personalId)){
+				return true;
+			}else {
+				return false;
+			}
+		}else {
+			return false;
+		}
+	}
 
 
 

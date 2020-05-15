@@ -72,6 +72,10 @@ public class Window extends JFrame{
 	
 	//NEW BANK ACCOUNT PANEL
 	private JPanel baNewAccountPanel;
+	private JTextField newAccPass;
+	private JLabel passLabel;
+	private JLabel newPassWarning;
+	private JLabel newPassSuccess;
 	
 	//constructor
 	public Window(ArrayList<Client> bankClients,ArrayList<BankAccount> bankAccounts) {
@@ -793,10 +797,11 @@ public class Window extends JFrame{
 					if(checkNewAccountInput()){
 						//checks the birht input format is correct -- if not throws ParseException
 						checkValidBirth(birth.getText());
+						//sets visible the last panel -- to set new password
 						clientNewAccountPanel.setVisible(false);
-						baNewAccountPanel.setVisible(true);
 						backBtn.setVisible(false);
 						continueBtn.setVisible(false);
+						baNewAccountPanel.setVisible(true);
 					}else{
 					//show "fill all fields" warning
 					completeFieldsWarning.setVisible(true);
@@ -924,6 +929,12 @@ public class Window extends JFrame{
 		}
 	}
 	
+	//this will never throw ParseException in this program since it's being called
+	//once it's been checked the correct dateFormat(dd/MM/yyyy) of the string (parameter)
+	private Date getDateFromString(String stringDate) throws ParseException {
+		Date returnedDate = dateFormat.parse(stringDate);
+		return returnedDate;
+	}
 	
 	
 	
@@ -944,37 +955,111 @@ public class Window extends JFrame{
 	}
 	
 	private void loadBaPasswordLabel() {
-		JLabel passLabel = new JLabel("New account password");
+		passLabel = new JLabel("New account password");
+		newPassWarning = new JLabel("");
+		newPassSuccess = new JLabel("");
 		
 		passLabel.setBounds(200,0,200,20);
 		passLabel.setFont(warningFont);
-		passLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		
+		newPassWarning.setBounds(200,53,200,20);
+		newPassWarning.setFont(warningFont);
+		newPassWarning.setForeground(Color.red);
+		
+		newPassSuccess.setBounds(200,170,200,20);
+		newPassSuccess.setFont(warningFont);
+		newPassSuccess.setForeground(Color.blue);
+		newPassSuccess.setHorizontalAlignment(SwingConstants.CENTER);
 		
 		baNewAccountPanel.add(passLabel);
+		baNewAccountPanel.add(newPassWarning);
+		baNewAccountPanel.add(newPassSuccess);
 	}
 	
 	private void loadBaPasswordField() {
-		JTextField newAccPass = new JTextField();
+		newAccPass = new JTextField();
 		
-		newAccPass.setBounds(200,23,200,20);
+		newAccPass.setBounds(200,30,200,20);
 		newAccPass.setFont(inputFont);
 		
 		baNewAccountPanel.add(newAccPass);
+		
+		FocusListener newPassFocus = new FocusListener() {
+			@Override
+			public void focusGained(FocusEvent e) {
+				newPassWarning.setText("");
+			}
+			@Override
+			public void focusLost(FocusEvent e) {
+				// TODO Auto-generated method stub
+			}
+		};
+		newAccPass.addFocusListener(newPassFocus);
 	}
 	
 	private void loadBaButtons() {
 		JButton finishBtn = new JButton("Finish");
-		JButton cancelBtn = new JButton("Cancel");
+		JButton cancelBtn = new JButton("Exit to index");
 		
-		finishBtn.setBounds(200,73,200,30);
-		cancelBtn.setBounds(200,118,200,30);
+		finishBtn.setBounds(200,83,200,30);
+		cancelBtn.setBounds(200,128,200,30);
 		
 		baNewAccountPanel.add(finishBtn);
 		baNewAccountPanel.add(cancelBtn);
 		
 		//finish button action listener
+		ActionListener finishActionListener = new ActionListener() {
+			@Override 
+			public void actionPerformed(ActionEvent ae) {
+				if(newAccPass.getText().length() >= 5) {
+					try{
+						Client newClient = new Client(firstName.getText(),lastName.getText(),address.getText(),personalId.getText(),getDateFromString(birth.getText())); 
+						if(!clientExists(newClient)) {
+							clients.add(newClient);
+						}
+						accounts.add(new BankAccount(newClient,newAccPass.getText()));
+						newAccPass.setText("");
+						newPassWarning.setVisible(false);
+						newPassSuccess.setVisible(true);
+						newPassSuccess.setText("Done");
+						System.out.println("New account created");
+					}catch (ParseException pEx){
+						System.out.println("This should never happened");
+					}
+				}else {
+					//warning: pass must have 5 or more characters
+					newAccPass.setText("");
+					newPassSuccess.setVisible(false);
+					newPassWarning.setVisible(true);
+					newPassWarning.setText("Must have 5 characters or more");
+				}
+			}
+		};
+		finishBtn.addActionListener(finishActionListener);
 		
 		//cancel button action listener
+		ActionListener cancelActionListener = new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent ae) {
+				newAccPass.setText("");
+				newPassWarning.setVisible(false);
+				newPassSuccess.setVisible(false);
+				baNewAccountPanel.setVisible(false);
+				newAccountPanel.setVisible(false);
+				indexPanel.setVisible(true);
+			}
+		};
+		cancelBtn.addActionListener(cancelActionListener);
+	}
+	
+	//checks if a Client already exists in the bank's AL<Client> 
+	private boolean clientExists(Client client) {
+		boolean exists = false;
+		for(Client c : clients) {
+			if(c.equals(client))
+				exists = true;
+		}
+		return exists;
 	}
 }
 
