@@ -1,5 +1,5 @@
 package itsBank;
-
+//comentario
 import java.util.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -15,7 +15,7 @@ public class Bank {
 		try {
 			//4 already initialized clients
 			bankClients.add(new Client("Benjamin","Juarez","JB Justo Street 2412","40719256",dateFormat.parse("10/05/1997")));
-			bankClients.add(new Client("Andrés","Lederer Dobra","Larrea Street 2230","39647094",dateFormat.parse("02/07/1996")));
+			bankClients.add(new Client("AndrÃ©s","Lederer Dobra","Larrea Street 2230","39647094",dateFormat.parse("02/07/1996")));
 			bankClients.add(new Client("Jael","Stainer","Don Donalds Road 24","39456852",dateFormat.parse("24/11/1996")));
 			bankClients.add(new Client("Luiza","Paixao","Whiteladies Road 101","40234122",dateFormat.parse("27/01/1997")));
 			
